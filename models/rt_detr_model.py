@@ -2,7 +2,7 @@ from ultralytics import RTDETR
 import cv2
 
 class RTDETR_Model:
-    def __init__(self, confidence_threshold=0.5):
+    def __init__(self, confidence_threshold=0.4):
         print("[BİLGİ] RT-DETR Yükleniyor... Model: rtdetr-l.pt")
         self.model = RTDETR("rtdetr-l.pt")
         self.threshold = confidence_threshold

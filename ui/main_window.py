@@ -8,6 +8,7 @@ import numpy as np
 from ui.sidebar_panel import SidebarPanel
 from ui.video_panel import VideoPanel
 
+
 from models.faster_rcnn import FasterRCNN_Model
 from models.mask_rcnn import MaskRCNN_Model
 from models.yolov8_model import YOLOv8_Model
@@ -25,8 +26,10 @@ class ObjectDetectionApp(ctk.CTk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
-        self.sidebar = SidebarPanel(self, start_callback=self.start_analysis, width=250, corner_radius=0)
+        self.sidebar = SidebarPanel(self, start_callback=self.start_analysis, pause_callback=self.toggle_pause, width=250, corner_radius=0)
         self.sidebar.grid(row=0, column=0, sticky="nsew")
+
+        self.is_paused = False
 
         self.video_panel = VideoPanel(self, corner_radius=10)
         self.video_panel.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
@@ -111,6 +114,10 @@ class ObjectDetectionApp(ctk.CTk):
             fps = 30
         self.frame_delay = int(1000 / fps)
 
+        self.is_paused = False # Modeller yeniden seçilip başlatılırsa duraklatmayı kaldır
+        if hasattr(self.sidebar, 'pause_btn'):
+            self.sidebar.pause_btn.configure(text="Duraklat", fg_color="#d97706", hover_color="#b45309")
+
         self.is_running = True
         self.process_video_stream()
 
@@ -144,6 +151,11 @@ class ObjectDetectionApp(ctk.CTk):
 
     def process_video_stream(self):
         if not self.is_running or self.cap is None:
+            return
+
+        if self.is_paused:
+            # Döngüyü tamamen öldürmüyoruz, 100ms sonra tekrar kontrol etmesi için kuyruğa alıyoruz
+            self.stream_after_id = self.after(100, self.process_video_stream)
             return
 
         start_time = time.perf_counter()
@@ -211,6 +223,15 @@ class ObjectDetectionApp(ctk.CTk):
         elapsed_time = int((time.perf_counter() - start_time) * 1000)
         wait_time = max(1, self.frame_delay - elapsed_time)
         self.stream_after_id = self.after(wait_time, self.process_video_stream)
+    
+    def toggle_pause(self):
+        """
+        Video veya kamera akışını anlık olarak duraklatır veya devam ettirir.
+        """
+        if not self.is_running:
+            return False
+        self.is_paused = not self.is_paused
+        return self.is_paused
 
     def on_closing(self):
         self.is_running = False

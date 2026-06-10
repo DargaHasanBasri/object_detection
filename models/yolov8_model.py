@@ -2,7 +2,7 @@ from ultralytics import YOLO
 import cv2
 
 class YOLOv8_Model:
-    def __init__(self, confidence_threshold=0.5):
+    def __init__(self, confidence_threshold=0.4):
         print("[BİLGİ] YOLOv8 Yükleniyor... Model: yolov8n.pt")
         self.model = YOLO("yolov8n.pt")
         self.threshold = confidence_threshold
