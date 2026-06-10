@@ -3,9 +3,10 @@ from tkinter import filedialog
 import os
 
 class SidebarPanel(ctk.CTkFrame):
-    def __init__(self, master, start_callback, **kwargs):
+    def __init__(self, master, start_callback, pause_callback, **kwargs):
         super().__init__(master, **kwargs)
         self.start_callback = start_callback
+        self.pause_callback = pause_callback
         
         # Seçilen veri kaynağını tutacak değişkenler
         self.source_path = None
@@ -67,7 +68,19 @@ class SidebarPanel(ctk.CTkFrame):
 
         # --- ÇALIŞTIR BUTONU ---
         self.start_btn = ctk.CTkButton(self, text="Analizi Başlat", height=40, command=self.on_start_click)
-        self.start_btn.pack(padx=20, pady=20, fill="x")
+        self.start_btn.pack(padx=20, pady=(20, 10), fill="x")
+
+        # --- DURAKLAT / DEVAM ET BUTONU ---
+        self.pause_btn = ctk.CTkButton(self, text="Duraklat", height=40, fg_color="#d97706", hover_color="#b45309", command=self.on_pause_click)
+        self.pause_btn.pack(padx=20, pady=(0, 20), fill="x")
+
+    def on_pause_click(self):
+        if self.pause_callback:
+            is_paused = self.pause_callback()
+            if is_paused:
+                self.pause_btn.configure(text="Devam Et", fg_color="#16a34a", hover_color="#15803d")
+            else:
+                self.pause_btn.configure(text="Duraklat", fg_color="#d97706", hover_color="#b45309")
 
     def select_image(self):
         file_path = filedialog.askopenfilename(

@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 
 class MaskRCNN_Model:
-    def __init__(self, confidence_threshold=0.5):
+    def __init__(self, confidence_threshold=0.4):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(f"[BİLGİ] Mask R-CNN Yükleniyor... Cihaz: {self.device}")
         
